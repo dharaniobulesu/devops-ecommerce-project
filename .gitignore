@@ -15,3 +15,11 @@ crash.*.log
 
 # OS files
 .DS_Store
+
+# Kubernetes credentials
+.kube/
+kubeconfig
+kubeconfig.*
+
+# Docker credentials
+.docker/
