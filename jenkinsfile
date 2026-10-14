@@ -1,0 +1,24 @@
+
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout Verification') {
+            steps {
+                echo 'Jenkins pipeline started'
+                echo 'Repository: devops-ecommerce-project'
+                sh 'pwd'
+                sh 'ls -la'
+            }
+        }
+
+        stage('Verify Application') {
+            steps {
+                sh 'ls -la application'
+                sh 'test -f application/Dockerfile'
+                sh 'test -f application/app.py'
+                echo 'Application files verified'
+            }
+        }
+    }
+}
