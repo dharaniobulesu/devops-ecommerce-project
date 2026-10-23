@@ -2,6 +2,7 @@
 .terraform/
 *.tfstate
 *.tfstate.*
+tfplan
 crash.log
 crash.*.log
 
@@ -12,6 +13,10 @@ crash.*.log
 # Secrets
 .env
 *.pem
+*.crt
+
+# Downloaded binaries (not project source)
+*.exe
 
 # OS files
 .DS_Store
