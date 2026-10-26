@@ -1,23 +1,67 @@
-
 pipeline {
     agent any
-
+ 
     stages {
-        stage('Checkout Verification') {
+        stage('Checkout') {
             steps {
-                echo 'Jenkins pipeline started'
-                echo 'Repository: devops-ecommerce-project'
-                sh 'pwd'
-                sh 'ls -la'
+                git branch: 'master',
+                    url: 'https://github.com/dharaniobulesu/devops-ecommerce-project.git'
+            }
+        }
+ 
+        stage('Install Dependencies') {
+            steps {
+                dir('application') {
+                    sh 'python3 --version'
+                    sh 'pip3 --version'
+                    sh 'pip3 install -r requirements.txt'
+                }
+            }
+        }
+ 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    dir('application') {
+                        sh '''
+                            pip3 install --user pysonar
+                            export PATH="$HOME/.local/bin:$PATH"
+                            pysonar \
+                              --sonar-host-url=http://sonarqube:9000 \
+                              --sonar-project-key=ecommerce \
+                              --token="$SONAR_AUTH_TOKEN"
+                        '''
+                    }
+                }
             }
         }
 
-        stage('Verify Application') {
+        stage('Quality Gate') {
             steps {
-                sh 'ls -la application'
-                sh 'test -f application/Dockerfile'
-                sh 'test -f application/app.py'
-                echo 'Application files verified'
+                dir('application') {
+                    timeout(time: 5, unit: 'MINUTES') {
+                        waitForQualityGate abortPipeline: true
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                dir('application') {
+                    sh "docker build -t dharaniobulesunukanaboyin21882/ecommerce-api:${BUILD_NUMBER} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh '''
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push dharaniobulesunukanaboyin21882/ecommerce-api:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
     }

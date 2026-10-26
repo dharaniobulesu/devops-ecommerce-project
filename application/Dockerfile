@@ -6,6 +6,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates
     && rm -rf /var/lib/apt/lists/*
 ENV PIP_CERT=/etc/ssl/certs/ca-certificates.crt
 COPY app.py .
-RUN pip install  --no-cache-dir flask
+RUN pip install --no-cache-dir flask==3.0.3
 EXPOSE 5000
 CMD ["python","app.py"]
