@@ -14,6 +14,9 @@ crash.*.log
 .env
 *.pem
 *.crt
+# corporate-ca-bundle.crt only contains public root/intermediate CA certs,
+# required in the Docker build context for Jenkins CI builds
+!application/corporate-ca-bundle.crt
 
 # Downloaded binaries (not project source)
 *.exe

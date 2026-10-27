@@ -28,6 +28,10 @@ RUN curl -fsSL --retry 5 --retry-all-errors "https://awscli.amazonaws.com/awscli
 RUN curl -fsSL --retry 5 --retry-all-errors "https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl \
     && chmod +x /usr/local/bin/kubectl
 
+# docker.sock (mounted from the host) is owned by root:root on Docker Desktop for Windows,
+# so add jenkins to the root group to allow docker CLI access without running as root
+RUN usermod -aG root jenkins
+
 USER jenkins
 
 ENV JAVA_OPTS="-Djavax.net.ssl.trustStore=/opt/java/openjdk/lib/security/cacerts -Djavax.net.ssl.trustStorePassword=changeit"
